@@ -2,5 +2,5 @@
 
 Docker
 
-docker build --tag <name>
-docker run <name>
+docker build --tag [name]
+docker run [name]
