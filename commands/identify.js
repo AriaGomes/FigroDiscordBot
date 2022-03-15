@@ -11,6 +11,22 @@ async function downloadImage(url) {
 	fs.writeFileSync('testimg.jpg', buffer);
 }
 
+function validURL(str) {
+	// protocols
+	const pattern = new RegExp('^(https?:\\/\\/)?' +
+	// domain name
+ '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+ // OR ip (v4) address
+ '((\\d{1,3}\\.){3}\\d{1,3}))' +
+ // port and path
+ '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+ // query string
+ '(\\?[;&a-z\\d%_.~+=-]*)?' +
+// fragment locator
+'(\\#[-a-z\\d_]*)?$', 'i');
+	return !!pattern.test(str);
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('identify')
@@ -20,16 +36,36 @@ module.exports = {
 		const imageURL = interaction.options.getString('image');
 		let predictions = null;
 		if (!imageURL) {
-			await interaction.reply('Please enter a valid image URL');
+			await interaction.reply('Please enter an image URL');
 		}
-		else {
-			await downloadImage(imageURL);
-			const image = fs.readFileSync('testimg.jpg');
-			const decodedImage = tfnode.node.decodeImage(image, 3);
-			const model = await mobilenet.load();
-			predictions = await model.classify(decodedImage);
+		if (validURL(imageURL)) {
+			try {
+				await interaction.reply('Working on it...');
+				await downloadImage(imageURL);
+				const image = fs.readFileSync('testimg.jpg');
+				const decodedImage = tfnode.node.decodeImage(image, 3);
+				const model = await mobilenet.load();
+				predictions = await model.classify(decodedImage);
+				fs.unlink('./testimg.jpg', (err) => {
+					if (err) throw err;
+				});
+			}
+			catch (err) {
+				await interaction.editReply('Unable to pull image from URL');
+				console.log(err);
+			}
+
+			if (predictions) {
+				let message = 'I think this is: \n';
+				for (let i = 0; i < predictions.length; i++) {
+					message += `${predictions[i].className}: ${predictions[i].probability.toFixed(4) * 100}%\n`;
+				}
+				await interaction.editReply(message);
+			}
 			// console.log('predictions:', predictions);
 		}
-		await interaction.reply(`I think this is a ${predictions[0].className} (${predictions[0].probability * 100}%)`);
+		else {
+			await interaction.reply('Please enter a valid image URL');
+		}
 	},
 };
