@@ -31,13 +31,14 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('identify')
 		.setDescription('Takes an image and identifies what it is')
-		.addStringOption(options => options.setName('image').setDescription('Enter URL of image to identify')),
+		.addStringOption(options => options
+			.setName('image')
+			.setDescription('Enter URL of image to identify')
+			.setRequired(true)),
 	async execute(interaction) {
 		const imageURL = interaction.options.getString('image');
 		let predictions = null;
-		if (!imageURL) {
-			await interaction.reply('Please enter an image URL');
-		}
+
 		if (validURL(imageURL)) {
 			try {
 				await interaction.reply('Working on it...');
@@ -65,7 +66,7 @@ module.exports = {
 			// console.log('predictions:', predictions);
 		}
 		else {
-			await interaction.reply('Please enter a valid image URL');
+			await interaction.reply('Please enter a valid URL');
 		}
 	},
 };
