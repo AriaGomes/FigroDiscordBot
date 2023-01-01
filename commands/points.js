@@ -11,7 +11,6 @@ module.exports = {
 			.setRequired(false)),
 	async execute(interaction) {
 		const userId = interaction.options.getUser('user') ? interaction.options.getUser('user').id : interaction.user.id;
-		let userPoints;
 
 		mongoose.connect(mongoURL, {
 			dbName: dbName,

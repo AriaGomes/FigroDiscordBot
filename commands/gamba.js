@@ -12,6 +12,11 @@ module.exports = {
 		const bet = interaction.options.getString('bet');
 		const userId = interaction.user.id;
 
+		if (!Number.isInteger(Number(bet)) || bet <= 0)
+		{
+			return interaction.reply('Invalid bet');
+		}
+
 		mongoose.connect(mongoURL, {
 			dbName: dbName,
 			useNewUrlParser: true,

@@ -21,7 +21,13 @@ var userSchema = new mongoose.Schema({
 	username: String,
 	points: Number
 });
+var settingsSchema = new mongoose.Schema({
+	logChat: Boolean,
+	test: Boolean,
+	openAI: Boolean,
+});
 
+var Settings = mongoose.model('settings', settingsSchema);
 var User = mongoose.model('user', userSchema);
 
 client.commands = new Collection();
@@ -40,12 +46,49 @@ client.on('messageCreate', async (message) => {
 	const points = message.content.length;
 	const userId = message.author.id;
 
+	Settings.findOne({}, async function (err, settingsFound){
+		if (err) return console.log(err);
+
+		if (settingsFound.length == 0) {
+			var newSetting = new Settings({
+				logChat: false,
+				test: true,
+			});
+
+			newSetting.save((error, data) => {
+				if (error) return console.log(error);
+			});
+
+			console.log("No settings record, Created a new one ")
+		}
+		else
+		{
+			if(settingsFound.logChat)
+			{
+				var date = new Date()
+				var dir = `./logs/${date.getFullYear().toString()}/${(date.getMonth() + 1 ).toString()}/${(date.getDay() + 1).toString()}`
+				var timestamp = `${date.getHours().toString()}:${date.getMinutes().toString()}:${date.getSeconds().toString()} - `
+				var author = `${message.author.id} - ${message.author.username}: ` 
+				//Log Chat
+				if (!fs.existsSync(dir)){
+					fs.mkdirSync(dir, { recursive: true });
+				}
+
+				fs.appendFileSync(dir + '/log.txt', timestamp + author + message.content + '\n', { recursive: true }, function(err) {
+							if(err) {console.log(err) }})
+			}
+		}
+	})
+
+	const settings = await Settings.findOne({ });
+
 	if (message.channel.name === "open-ai") {
+		if (!settings.openAI) return await message.reply('Disabled. An admin needs to enable this in settings')
 		const configuration = new Configuration({
 			apiKey: openAIToken,
 		});
 		const openai = new OpenAIApi(configuration);
-
+		console.log(setting)
 		const response = await openai.createCompletion({
 			model: "text-davinci-003",
 			prompt: message.content,
