@@ -41,15 +41,15 @@ for (const file of commandFiles) {
 
 // On user message sent
 client.on('messageCreate', async (message) => {
-	if (message.author.bot) return;
+	//if (message.author.bot) return;
 
 	const points = message.content.length;
 	const userId = message.author.id;
 
 	Settings.findOne({}, async function (err, settingsFound){
 		if (err) return console.log(err);
-
 		if (settingsFound.length == 0) {
+			if (message.author.bot) return;
 			var newSetting = new Settings({
 				logChat: false,
 				test: true,
@@ -74,7 +74,7 @@ client.on('messageCreate', async (message) => {
 					fs.mkdirSync(dir, { recursive: true });
 				}
 
-				fs.appendFileSync(dir + '/log.txt', timestamp + author + message.content + '\n', { recursive: true }, function(err) {
+				fs.appendFileSync(dir + '/log.txt', timestamp + author + ` in #${message.channel.name}: ` + message.content + '\n', { recursive: true }, function(err) {
 							if(err) {console.log(err) }})
 			}
 		}
@@ -83,6 +83,7 @@ client.on('messageCreate', async (message) => {
 	const settings = await Settings.findOne({ });
 
 	if (message.channel.name === "open-ai") {
+		if (message.author.bot) return;
 		if (!settings.openAI) return await message.reply('Disabled. An admin needs to enable this in settings')
 		const configuration = new Configuration({
 			apiKey: openAIToken,
@@ -98,12 +99,13 @@ client.on('messageCreate', async (message) => {
 			presence_penalty: 0.6,
 			stop: [" Human:", " AI:"],
 		});
-		message.reply(response.data.choices[0].text)
+		await message.reply(response.data.choices[0].text)
 	}
 
 
 	User.find({ id: userId }, async function (err, userFound) {
 		if (err) return console.log(err);
+		if (message.author.bot) return;
 
 		//If user is not in DB add a new entry
 		if (userFound.length == 0) {
