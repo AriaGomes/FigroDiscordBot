@@ -1,7 +1,8 @@
 const fs = require('fs');
 // Require the necessary discord.js classes
 const { Client, Collection, Intents } = require('discord.js');
-const { token } = require('./config.json');
+const { token, openAIToken } = require('./config.json');
+const { Configuration, OpenAIApi } = require("openai");
 
 // Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
@@ -16,11 +17,31 @@ for (const file of commandFiles) {
 }
 
 // On user message sent
-client.on('messageCreate', (message) => {
+client.on('messageCreate', async (message) => {
 	if (message.author.bot) return;
 
 	const points = message.content.length;
 	const userId = message.author.id;
+
+	if(message.channel.name === "open-ai")
+	{
+		const configuration = new Configuration({
+			apiKey: openAIToken,
+		  });
+		  const openai = new OpenAIApi(configuration);
+		  
+		  const response = await openai.createCompletion({
+			model: "text-davinci-003",
+			prompt: message.content,
+			temperature: 0.9,
+			max_tokens: 150,
+			top_p: 1,
+			frequency_penalty: 0,
+			presence_penalty: 0.6,
+			stop: [" Human:", " AI:"],
+		  });
+		  message.reply(response.data.choices[0].text)
+	}
 
 	// If the user has a points file, add the points to their points
 	if (fs.existsSync(`./points/${userId}.json`)) {

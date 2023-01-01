@@ -5,5 +5,5 @@ yarn.lock
 package-lock.json
 .eslintrc.js
 yarn-error.log
-/points
+/points/*
 testimg.jpg
