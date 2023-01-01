@@ -88,7 +88,6 @@ client.on('messageCreate', async (message) => {
 			apiKey: openAIToken,
 		});
 		const openai = new OpenAIApi(configuration);
-		console.log(setting)
 		const response = await openai.createCompletion({
 			model: "text-davinci-003",
 			prompt: message.content,
