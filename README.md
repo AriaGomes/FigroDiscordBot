@@ -11,6 +11,8 @@ docker run [name]
 
 ### Setup
 
+`yarn` - install dependancies
+
 Create a config.json in the root of the project and enter your following values,(OpenAI is not required)
 ```
     "token": "Discord Token from Developer API",
@@ -21,3 +23,7 @@ Create a config.json in the root of the project and enter your following values,
     "mongoURL": "MongoDB Connection URL",
     "dbName": "MongoDB DB name"
 ```
+
+`yarn register` - will register slash commands to your discord app
+
+`yarn start` - Starts the bot
