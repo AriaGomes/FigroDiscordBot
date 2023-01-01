@@ -72,7 +72,7 @@ module.exports = {
                             settings.test = !settings.test;
 			                await settings.save();
                             break;
-                        case 'openAI':
+                        case 'openai':
                             settings.openAI = !settings.openAI;
 			                await settings.save();
                             break;
