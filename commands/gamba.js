@@ -1,4 +1,3 @@
-//Busted
 const mongoose = require('mongoose');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { mongoURL, dbName } = require('../config.json');
@@ -33,14 +32,12 @@ module.exports = {
 		}
 
 		if (random > 50) {
-			console.log('won');
 			const user = await User.findOne({ id: userId });
 			Number(user.points += Number(bet));
 			await user.save();
 			return interaction.reply('You Won! You now have ' + await user.points + ' points!');
 		}
 		else {
-			console.log('lost');
 			const user = await User.findOne({ id: userId });
 			Number(user.points -= Number(bet));
 			await user.save();

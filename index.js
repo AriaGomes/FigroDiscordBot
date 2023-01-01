@@ -40,8 +40,6 @@ client.on('messageCreate', async (message) => {
 	const points = message.content.length;
 	const userId = message.author.id;
 
-	console.log(userId)
-
 	if (message.channel.name === "open-ai") {
 		const configuration = new Configuration({
 			apiKey: openAIToken,

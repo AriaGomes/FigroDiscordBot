@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
+const { mongoURL, dbName } = require('../config.json');
+const mongoose = require('mongoose');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -12,15 +13,31 @@ module.exports = {
 		const userId = interaction.options.getUser('user') ? interaction.options.getUser('user').id : interaction.user.id;
 		let userPoints;
 
+		mongoose.connect(mongoURL, {
+			dbName: dbName,
+			useNewUrlParser: true,
+		}).then(() => {
+			console.log("Connected to mongo")
+		}).catch((err) => console.log(err.message))
+
+
+
+		var User = mongoose.model('user');
+		
+
 		// TODO add try catch for if the file doesn't exist
 		if (userId) {
-			userPoints = require(`../points/${userId}.json`);
+			
+			const user = await User.findOne({ id: userId })
+			if (user === null) return interaction.reply('This user has no record yet');
+
+			interaction.reply(`${user.points} points`);
 		}
 		else {
-			userPoints = require(`../points/${interaction.user.id}.json`);
+			const user = await User.findOne({ id: interaction.user.id })
+			if (user === null) return interaction.reply('You have no record yet try typing in the server');
+		
+			interaction.reply(`${user.points} points`);
 		}
-
-		interaction.reply(`${userPoints.points} points`);
-
 	},
 };
