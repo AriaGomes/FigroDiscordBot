@@ -1,8 +1,7 @@
 //Busted
-
+const mongoose = require('mongoose');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const fs = require('fs');
-
+const { mongoURL, dbName } = require('../config.json');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('gamba')
@@ -14,35 +13,38 @@ module.exports = {
 		const bet = interaction.options.getString('bet');
 		const userId = interaction.user.id;
 
+		mongoose.connect(mongoURL, {
+			dbName: dbName,
+			useNewUrlParser: true,
+		}).then(() => {
+			console.log("Connected to mongo")
+		}).catch((err) => console.log(err.message))
+
+
+
+		var User = mongoose.model('user');
+		const user = await User.findOne({ id: userId })
+		if (user === null) return interaction.reply('You have no record yet try typing in the server');
 		const random = Math.floor(Math.random() * 100);
+
+		if (bet > user.points) {
+			console.log('broke');
+			return interaction.reply('You do not have enough points to bet that amount!');
+		}
 
 		if (random > 50) {
 			console.log('won');
-				if (fs.existsSync(`./points/${userId}.json`)) {
-					const pointsFile = require(`../points/${userId}.json`);
-					if (bet > pointsFile.points) {
-						console.log('broke');
-						return interaction.reply('You do not have enough points to bet that amount!');
-					}
-					Number(pointsFile.points += bet);
-					fs.writeFileSync(`./points/${userId}.json`, JSON.stringify(pointsFile));
-					return interaction.reply('You Won! You now have ' + pointsFile.points + ' points!');
-				}
-			
+			const user = await User.findOne({ id: userId });
+			Number(user.points += Number(bet));
+			await user.save();
+			return interaction.reply('You Won! You now have ' + await user.points + ' points!');
 		}
 		else {
 			console.log('lost');
-				if (fs.existsSync(`./points/${userId}.json`)) {
-					const pointsFile = require(`../points/${userId}.json`);
-					if (bet > pointsFile.points) {
-						console.log('broke');
-						return interaction.reply('You do not have enough points to bet that amount!');
-					}
-					Number(pointsFile.points -= bet);
-					fs.writeFileSync(`./points/${userId}.json`, JSON.stringify(pointsFile));
-					return interaction.reply('You lost! You now have ' + pointsFile.points + ' points!');
-				}
-			
+			const user = await User.findOne({ id: userId });
+			Number(user.points -= Number(bet));
+			await user.save();
+			return interaction.reply('You Lost! You now have ' + await user.points + ' points!');
 		}
 	},
 };
