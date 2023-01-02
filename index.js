@@ -74,8 +74,16 @@ client.on('messageCreate', async (message) => {
 					fs.mkdirSync(dir, { recursive: true });
 				}
 
-				fs.appendFileSync(dir + '/log.txt', timestamp + author + ` in #${message.channel.name}: ` + message.content + '\n', { recursive: true }, function(err) {
-							if(err) {console.log(err) }})
+				if(message.content.length <= 0){
+					fs.appendFileSync(dir + '/log.txt', timestamp + author + ` in #${message.channel.name}: ` + '<embed> or not plain text' + '\n', { recursive: true }, function(err) {
+						if(err) {console.log(err) }})
+				}
+				else
+				{
+					fs.appendFileSync(dir + '/log.txt', timestamp + author + ` in #${message.channel.name}: ` + message.content + '\n', { recursive: true }, function(err) {
+						if(err) {console.log(err) }})
+				}
+				
 			}
 		}
 	})
