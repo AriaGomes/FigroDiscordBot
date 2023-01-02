@@ -48,7 +48,7 @@ client.on('messageCreate', async (message) => {
 
 	Settings.findOne({}, async function (err, settingsFound){
 		if (err) return console.log(err);
-		if (settingsFound.length == 0) {
+		if (!settingsFound) {
 			if (message.author.bot) return;
 			var newSetting = new Settings({
 				logChat: false,
