@@ -15,13 +15,13 @@ docker run [name]
 
 Create a config.json in the root of the project and enter your following values,(OpenAI is not required)
 ```
-    "token": "Discord Token from Developer API",
-    "clientId": "Discord App client ID from develeoper API",
-    "guildId": "Server ID, used to register commands",
-    "adminUserID": "Discord user ID of the admin user",
-    "openAIToken": "OpenAI token(optional)",
-    "mongoURL": "MongoDB Connection URL",
-    "dbName": "MongoDB DB name"
+TOKEN=<Discord Token from Developer API>
+CLIENT_ID=<Discord App client ID from develeoper API>
+GUILD_ID=<Server ID, used to register commands>
+ADMIN_USER_ID=<Discord user ID of the admin user>
+OPEN_AI_TOKEN=<OpenAI token (optional)>
+MONGO_URL=<MongoDB Connection URL>
+DB_NAME=<MongoDB DB name>
 ```
 
 `yarn register` - will register slash commands to your discord app

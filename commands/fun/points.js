@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { mongoURL, dbName } = require('../config.json');
+require('dotenv').config();
 const mongoose = require('mongoose');
 
 module.exports = {
@@ -12,30 +12,29 @@ module.exports = {
 	async execute(interaction) {
 		const userId = interaction.options.getUser('user') ? interaction.options.getUser('user').id : interaction.user.id;
 
-		mongoose.connect(mongoURL, {
-			dbName: dbName,
+		mongoose.connect(process.env.MONGO_URL, {
+			dbName: process.env.DB_NAME,
 			useNewUrlParser: true,
 		}).then(() => {
-			console.log("Connected to mongo")
-		}).catch((err) => console.log(err.message))
+			console.log('Connected to mongo');
+		}).catch((err) => console.log(err.message));
 
 
+		const User = mongoose.model('user');
 
-		var User = mongoose.model('user');
-		
 
 		// TODO add try catch for if the file doesn't exist
 		if (userId) {
-			
-			const user = await User.findOne({ id: userId })
+
+			const user = await User.findOne({ id: userId });
 			if (user === null) return interaction.reply('This user has no record yet');
 
 			interaction.reply(`${user.points} points`);
 		}
 		else {
-			const user = await User.findOne({ id: interaction.user.id })
+			const user = await User.findOne({ id: interaction.user.id });
 			if (user === null) return interaction.reply('You have no record yet try typing in the server');
-		
+
 			interaction.reply(`${user.points} points`);
 		}
 	},

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { mongoURL, dbName } = require('../config.json');
+require('dotenv').config();
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('gamba')
@@ -12,22 +13,20 @@ module.exports = {
 		const bet = interaction.options.getString('bet');
 		const userId = interaction.user.id;
 
-		if (!Number.isInteger(Number(bet)) || bet <= 0)
-		{
+		if (!Number.isInteger(Number(bet)) || bet <= 0) {
 			return interaction.reply('Invalid bet');
 		}
 
-		mongoose.connect(mongoURL, {
-			dbName: dbName,
+		mongoose.connect(process.env.MONGO_URL, {
+			dbName: process.env.DB_NAME,
 			useNewUrlParser: true,
 		}).then(() => {
-			console.log("Connected to mongo")
-		}).catch((err) => console.log(err.message))
+			console.log('Connected to mongo');
+		}).catch((err) => console.log(err.message));
 
 
-
-		var User = mongoose.model('user');
-		const user = await User.findOne({ id: userId })
+		const User = mongoose.model('user');
+		let user = await User.findOne({ id: userId });
 		if (user === null) return interaction.reply('You have no record yet try typing in the server');
 		const random = Math.floor(Math.random() * 100);
 
@@ -37,13 +36,13 @@ module.exports = {
 		}
 
 		if (random > 50) {
-			const user = await User.findOne({ id: userId });
+			user = await User.findOne({ id: userId });
 			Number(user.points += Number(bet));
 			await user.save();
 			return interaction.reply('You Won! You now have ' + await user.points + ' points!');
 		}
 		else {
-			const user = await User.findOne({ id: userId });
+			user = await User.findOne({ id: userId });
 			Number(user.points -= Number(bet));
 			await user.save();
 			return interaction.reply('You Lost! You now have ' + await user.points + ' points!');
