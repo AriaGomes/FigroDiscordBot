@@ -13,7 +13,7 @@ docker run [name]
 
 `yarn` - install dependancies
 
-Create a config.json in the root of the project and enter your following values,(OpenAI is not required)
+Create a .env file in the root of the project and enter your following values,(OpenAI API key is not required)
 ```
 TOKEN=<Discord Token from Developer API>
 CLIENT_ID=<Discord App client ID from develeoper API>
