@@ -12,8 +12,9 @@ const userSchema = new mongoose.Schema({
 });
 const settingsSchema = new mongoose.Schema({
 	logChat: Boolean,
-	test: Boolean,
 	openAI: Boolean,
+	adminRole: String,
+	adminUser: String,
 });
 
 const Settings = mongoose.model('settings', settingsSchema);
@@ -34,7 +35,9 @@ module.exports = {
 				if (message.author.bot) return;
 				const newSetting = new Settings({
 					logChat: false,
-					test: true,
+					adminUser: process.env.ADMIN_USER_ID,
+					adminRole: 'no role defined',
+					openAI: false,
 				});
 
 				newSetting.save((error) => {

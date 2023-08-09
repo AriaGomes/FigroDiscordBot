@@ -14,8 +14,9 @@ module.exports = {
 		async function showSettings(settings) {
 			await interaction.reply('```'
                     + 'logChat: ' + settings.logChat + '\n'
-                    + 'test: ' + settings.test + '\n'
                     + 'openAI: ' + settings.openAI + '\n'
+					+ 'adminRole: ' + '<@' + settings.adminRole + '>' + '\n'
+					+ 'adminUser: ' + '<@' + process.env.ADMIN_USER_ID + '>' + '\n'
                     + '```');
 		}
 
@@ -42,6 +43,8 @@ module.exports = {
 					logChat: false,
 					test: true,
 					openAI: false,
+					adminRole: 'no role defined',
+					adminUser: process.env.ADMIN_USER_ID,
 				});
 
 				newSetting.save((error) => {
